@@ -12,6 +12,8 @@ void PrintHelp() {
   WriteLine("\tCreate a new project definition.");
   WriteLine("config,configure");
   WriteLine("\tCreate project scripts and structure with mkcproj.");
+  WriteLine("\t-gi, --git-ignore");
+  WriteLine("\tLet mkcproj create .gitignore.");
   WriteLine("nlconfig,new-local-configure,new-lconfig");
   WriteLine("\tCreate a local configure for local machine that specifies C "
             "compiler, output path and install path.");
@@ -28,6 +30,7 @@ int main(int c, cstr *v) {
   cstr name = null;
   cstr version = null;
   int operation = 0;
+  bool CreateGI = false;
   for (int i = 1; i < c; i++) {
     cstr item = v[i];
     if (CStrIsEqual(item, "make") || CStrIsEqual(item, "build")) {
@@ -55,6 +58,8 @@ int main(int c, cstr *v) {
       i++;
     } else if (CStrIsEqual(item, "-i") || CStrIsEqual(item, "--info")) {
       operation = 5;
+    } else if (CStrIsEqual(item, "-gi") || CStrIsEqual(item, "--git-ignore")) {
+      CreateGI = true;
     }
   }
   switch (operation) {
@@ -120,13 +125,14 @@ int main(int c, cstr *v) {
     WriteLine(LC.OutputPath);
     Write("Install:");
     WriteLine(LC.InstallPath);
-    cstr cmd = malloc(sizeof(char) * (256 * 3));
+    cstr cmd = malloc(sizeof(char) * (256 * 4));
     cstr p0 = "mkcproj ";
     cstr pname = " -n ";
     cstr quate = "\"";
     cstr pversion = " -v ";
     cstr po = " -o ";
     cstr pi = " -i ";
+    cstr pgi = " -gi ";
     cstr pcc = " -cc ";
     strcpy(cmd, p0);
     strcat(cmd, pname);
@@ -149,6 +155,9 @@ int main(int c, cstr *v) {
     strcat(cmd, quate);
     strcat(cmd, LC.InstallPath);
     strcat(cmd, quate);
+    if (CreateGI) {
+      strcat(cmd, pgi);
+    }
     system(cmd);
   } break;
   case 5:
